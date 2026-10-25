@@ -1,0 +1,34 @@
+// 1. Decouvrir les conteneurs Docker du PC
+discovery.docker "linux" {
+  host = "unix:///var/run/docker.sock"
+}
+
+// 2. Donner un nom lisible a chaque flux de logs : container="resilience-alpha-api-1", service="api"
+discovery.relabel "docker" {
+  targets = discovery.docker.linux.targets
+
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    regex         = "/(.*)"
+    target_label  = "container"
+  }
+
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_compose_service"]
+    target_label  = "service"
+  }
+}
+
+// 3. Lire les logs de ces conteneurs
+loki.source.docker "default" {
+  host       = "unix:///var/run/docker.sock"
+  targets    = discovery.relabel.docker.output
+  forward_to = [loki.write.local.receiver]
+}
+
+// 4. Les envoyer a Loki
+loki.write "local" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}

@@ -1,0 +1,15 @@
+.env
+__pycache__/
+*.pyc
+
+# Environnement Python et fichiers locaux
+.venv/
+assistant-ia/.venv/
+
+# Documents d'exploitation d'Ismael (pas a moi) : a fournir soi-meme
+assistant-ia/docs/*.md
+!assistant-ia/docs/README.md
+assistant-ia/docs-hors-index/
+
+# Fichiers de travail personnels
+PROMPT-SYNC-ISMAEL.md

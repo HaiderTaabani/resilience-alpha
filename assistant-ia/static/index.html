@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>RESILIENCE-ALPHA - Assistant opérateur</title>
+  <style>
+    :root {
+      --primary: #B5174E;   /* framboise */
+      --primary-d: #8E1240;
+      --plum: #5B2B82;      /* violet prune */
+      --orange: #E8821E;
+      --rose: #C77DB0;
+      --cream: #F2E3C9;
+      --bluegrey: #C9D4DB;
+      --ink: #2C1B33;
+      --muted: #6B5A74;
+      --line: #E7D8C4;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(1200px 650px at 8% -10%, rgba(181, 23, 78, 0.13), transparent 60%),
+        radial-gradient(1000px 560px at 112% 0%, rgba(232, 130, 30, 0.12), transparent 55%),
+        radial-gradient(900px 560px at 50% 120%, rgba(91, 43, 130, 0.09), transparent 55%),
+        linear-gradient(160deg, #FFFDF9 0%, #F7EFE1 55%, #F2E3C9 100%);
+      background-attachment: fixed;
+    }
+    main { max-width: 860px; margin: 0 auto; padding: 28px 22px 40px; }
+
+    /* En-tete */
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+    .brand { display: flex; align-items: center; gap: 14px; }
+    .logo {
+      width: 46px; height: 46px; border-radius: 13px; display: grid; place-items: center;
+      background: linear-gradient(145deg, #E8821E, #B5174E 52%, #5B2B82);
+      box-shadow: 0 10px 24px rgba(181, 23, 78, 0.30);
+    }
+    h1 { margin: 0; font-size: 22px; letter-spacing: .2px; color: var(--primary); }
+    h1 small { font-size: 13px; font-weight: 500; color: var(--muted); margin-left: 6px; }
+    .pill {
+      display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 999px;
+      background: rgba(255, 255, 255, 0.84); color: var(--ink); font-size: 13px; font-weight: 600;
+      box-shadow: 0 6px 16px rgba(91, 43, 130, 0.10);
+    }
+    .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--orange); box-shadow: 0 0 0 3px rgba(232, 130, 30, 0.22); }
+
+    /* Banniere */
+    .hero {
+      border-radius: 16px; padding: 22px 26px; margin-bottom: 18px; display: flex; align-items: center; gap: 20px;
+      background: linear-gradient(120deg, #FBE7D4, #F6D9E6 55%, #EAD9EE);
+      box-shadow: 0 14px 34px rgba(91, 43, 130, 0.12);
+    }
+    .hero .shield { flex: none; width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; background: rgba(255,255,255,.75); box-shadow: 0 8px 20px rgba(91,43,130,.15); }
+    .hero h2 { margin: 0 0 4px; font-size: 18px; color: var(--plum); }
+    .hero p { margin: 0; font-size: 14px; color: var(--muted); line-height: 1.45; }
+
+    /* Cartes */
+    .card {
+      background: rgba(255, 255, 255, 0.80); border-radius: 16px; padding: 20px 22px; margin-bottom: 16px;
+      box-shadow: 0 18px 48px rgba(91, 43, 130, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    }
+    .card h3 {
+      margin: 0 0 14px; font-size: 13px; letter-spacing: .6px; text-transform: uppercase; color: var(--plum);
+      display: flex; align-items: center; gap: 8px;
+    }
+    textarea {
+      width: 100%; padding: 12px 14px; font: inherit; color: var(--ink); resize: vertical;
+      background: rgba(255, 255, 255, 0.9); border: 1px solid var(--line); border-radius: 10px; outline: none;
+    }
+    textarea:focus { box-shadow: 0 0 0 3px rgba(181, 23, 78, 0.20); border-color: var(--primary); }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 4px; }
+    .chip {
+      font: inherit; font-size: 13px; cursor: pointer; padding: 7px 12px; border-radius: 999px; color: var(--ink);
+      background: rgba(201, 212, 219, 0.40); border: 1px solid transparent;
+    }
+    .chip:hover { background: rgba(199, 125, 176, 0.25); color: var(--primary-d); }
+    button.send {
+      margin-top: 12px; width: 100%; padding: 12px; border: 0; border-radius: 10px; cursor: pointer;
+      font: inherit; font-weight: 700; color: #fff; background: linear-gradient(180deg, #C8265C, #B5174E);
+      box-shadow: 0 8px 20px rgba(181, 23, 78, 0.30);
+    }
+    button.send:hover { background: linear-gradient(180deg, #B5174E, #8E1240); }
+    button.send:disabled { opacity: .55; cursor: wait; }
+
+    /* Reponse */
+    .answer { white-space: pre-wrap; line-height: 1.55; font-size: 15px; border-left: 4px solid var(--primary); padding-left: 14px; }
+    .answer.wait { color: var(--muted); border-left-color: var(--orange); }
+    .answer.err { color: #8E1240; border-left-color: #8E1240; background: rgba(181, 23, 78, 0.06); padding: 10px 14px; border-radius: 8px; }
+    .meta { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 12px; font-size: 12px; color: var(--muted); }
+    .src { padding: 3px 10px; border-radius: 999px; background: rgba(91, 43, 130, 0.10); color: var(--plum); font-weight: 600; }
+    footer { text-align: center; font-size: 12px; color: #9a8aa2; margin-top: 22px; }
+    .dots::after { content: ""; animation: dots 1.2s steps(4, end) infinite; }
+    @keyframes dots { 0% { content: ""; } 25% { content: "."; } 50% { content: ".."; } 75% { content: "..."; } }
+  </style>
+</head>
+<body>
+<main>
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8.2-7 10-4-1.8-7-5.5-7-10V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>
+      </div>
+      <h1>RESILIENCE-ALPHA <small>Assistant opérateur · Groupe 15</small></h1>
+    </div>
+    <span class="pill"><span class="dot"></span>IA locale · lecture seule</span>
+  </div>
+
+  <section class="hero">
+    <div class="shield" aria-hidden="true">
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#5B2B82" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8.2-7 10-4-1.8-7-5.5-7-10V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>
+    </div>
+    <div>
+      <h2>Posez une question sur l'exploitation de la plateforme</h2>
+      <p>Je réponds à partir de la documentation interne (architecture, runbooks, paramètres) et je cite mes sources. Je n'ai aucun accès au système : j'explique, la remédiation automatique agit.</p>
+    </div>
+  </section>
+
+  <section class="card">
+    <h3>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5B2B82" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Ma question
+    </h3>
+    <textarea id="q" rows="3" maxlength="500" placeholder="Ex. : Que fait la remédiation en cas de credential stuffing ?"></textarea>
+    <div class="chips" id="chips">
+      <button class="chip" type="button">Que fait la remédiation en cas de credential stuffing ?</button>
+      <button class="chip" type="button">Comment le rate-limiting du WAF est-il levé ?</button>
+      <button class="chip" type="button">Que se passe-t-il si un service tombe ?</button>
+    </div>
+    <button class="send" id="go" type="button">Demander</button>
+  </section>
+
+  <section class="card" id="resultCard" style="display:none">
+    <h3>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5B2B82" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/></svg>
+      Réponse
+    </h3>
+    <div class="answer" id="answer"></div>
+    <div class="meta" id="meta"></div>
+  </section>
+
+  <footer>© 2026 RESILIENCE-ALPHA · Groupe 15 · Assistant IA local, en lecture seule, sans accès au système</footer>
+</main>
+<script>
+  const q = document.getElementById("q"), go = document.getElementById("go");
+  const card = document.getElementById("resultCard"), answer = document.getElementById("answer"), meta = document.getElementById("meta");
+
+  async function ask() {
+    const question = q.value.trim();
+    if (question.length < 3 || go.disabled) return;
+    go.disabled = true;
+    card.style.display = "block";
+    meta.replaceChildren();
+    answer.className = "answer wait";
+    answer.textContent = "Recherche dans la documentation";
+    answer.classList.add("dots");
+    try {
+      const r = await fetch("/ask", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ question }) });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.detail || "Erreur " + r.status);
+      answer.className = "answer";
+      answer.textContent = data.answer;                 // textContent : jamais de HTML venant du modele
+      const label = document.createElement("span");
+      label.textContent = "Sources :";
+      meta.appendChild(label);
+      data.sources.forEach((s) => {
+        const pill = document.createElement("span");
+        pill.className = "src";
+        pill.textContent = s;
+        meta.appendChild(pill);
+      });
+      const t = document.createElement("span");
+      t.textContent = "· " + data.seconds + " s";
+      meta.appendChild(t);
+    } catch (e) {
+      answer.className = "answer err";
+      answer.textContent = "Impossible de répondre : " + e.message;
+    } finally {
+      go.disabled = false;
+    }
+  }
+
+  go.addEventListener("click", ask);
+  q.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); ask(); } });
+  document.querySelectorAll("#chips .chip").forEach((c) => c.addEventListener("click", () => { q.value = c.textContent; ask(); }));
+</script>
+</body>
+</html>
