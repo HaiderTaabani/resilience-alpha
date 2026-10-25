@@ -1,4 +1,4 @@
-# RESILIENCE-ALPHA - version personnelle (workshop EPSI Bac+5, groupe 15)
+# RESILIENCE-ALPHA - version personnelle
 
 Plateforme de paiement **fictive** qui subit un incident de securite et retrouve son fonctionnement
 sans intervention humaine. Ce depot est ma **version personnelle** construite pendant le workshop :
